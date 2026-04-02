@@ -183,7 +183,7 @@
       margin-bottom: 4px;
     }
     .chart-section .sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
-    .chart-container { position: relative; height: 220px; }
+    .chart-container { position: relative; height: 320px; }
 
     /* ── Repo Cards ── */
     .repos-grid {
@@ -496,11 +496,11 @@
     chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: top10.map(r => r.name.length > 16 ? r.name.slice(0,16)+'…' : r.name),
+        labels: top10.map(r => r.name),
         datasets: [{
           data: top10.map(r => r._gr),
           backgroundColor: top10.map((_, i) => {
-            const alpha = 0.35 + (i / top10.length) * 0.65;
+            const alpha = 0.4 + (i / top10.length) * 0.6;
             return `rgba(0,113,227,${alpha})`;
           }),
           borderRadius: 5,
@@ -508,6 +508,7 @@
         }]
       },
       options: {
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -521,14 +522,14 @@
         },
         scales: {
           x: {
-            grid: { display: false },
-            ticks: { color: '#86868b', font: { size: 11 } },
+            grid: { color: '#e5e5ea', lineWidth: 0.5 },
+            ticks: { color: '#86868b', font: { size: 11 }, callback: v => v + '⭐' },
             border: { display: false }
           },
           y: {
-            grid: { color: '#d2d2d7', lineWidth: 0.5 },
-            ticks: { color: '#86868b', font: { size: 11 }, callback: v => v + '⭐' },
-            border: { display: false, dash: [3, 3] }
+            grid: { display: false },
+            ticks: { color: '#1d1d1f', font: { size: 12 } },
+            border: { display: false }
           }
         }
       }
