@@ -431,7 +431,7 @@
   // 日增速率: stars / 存活天数
   function growthRate(r) {
     const days = Math.max(1, Math.ceil((Date.now() - new Date(r.created_at)) / 86400000));
-    return Math.round(r.stargazers_count / days * 10) / 10;
+    return Math.round(r.stargazers_count / days);
   }
 
   async function fetchRepos(days) {
@@ -458,8 +458,8 @@
     const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
     const total = repos.reduce((s, r) => s + r.stargazers_count, 0);
     document.getElementById('s-repos').textContent = repos.length;
-    document.getElementById('s-top').textContent = maxGr ? `${maxGr}⭐` : '—';
-    document.getElementById('s-total').textContent = total >= 1000 ? Math.round(total/1000)+'k' : total;
+    document.getElementById('s-top').textContent = maxGr ? `${Math.round(maxGr).toLocaleString()}⭐` : '—';
+    document.getElementById('s-total').textContent = total >= 1000 ? Math.round(total/1000)+'K' : total.toLocaleString();
     document.getElementById('s-lang').textContent = langs.length;
   }
 
@@ -480,7 +480,7 @@
         <div class="repo-desc">${r.description || '—'}</div>
         <div class="repo-footer">
           <div class="repo-stars">⭐ ${r.stargazers_count.toLocaleString()}</div>
-          <div class="repo-growth">${r._gr}<span>⭐/天</span></div>
+          <div class="repo-growth">${Math.round(r._gr).toLocaleString()}<span>⭐/天</span></div>
         </div>
         <div class="growth-bar-bg">
           <div class="growth-bar" style="width:${pct}%"></div>
@@ -516,7 +516,13 @@
           tooltip: {
             callbacks: {
               title: ctx => top10[ctx[0].dataIndex].full_name || top10[ctx[0].dataIndex].name,
-              label: ctx => ` ${ctx.raw}⭐/天 · 共 ${top10[ctx[0].dataIndex].stargazers_count.toLocaleString()}⭐`
+              label: ctx => {
+                const raw = top10[ctx[0].dataIndex];
+                const stars = raw.stargazers_count >= 1000
+                  ? (raw.stargazers_count / 1000).toFixed(0) + 'K'
+                  : raw.stargazers_count.toLocaleString();
+                return ` ${Math.round(ctx.raw).toLocaleString()}⭐/天 · 共 ${stars}⭐`;
+              }
             }
           }
         },
