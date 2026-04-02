@@ -1,0 +1,134 @@
+{
+  "source": "Hacker News",
+  "url": "https://news.ycombinator.com",
+  "scraped_at": "2026-04-02 18:56",
+  "total": 14,
+  "stories": [
+    {
+      "rank": 1,
+      "title": "IBM Announces Strategic Collaboration with Arm",
+      "url": "https://newsroom.ibm.com/2026-04-02-ibm-announces-strategic-collaboration-with-arm-to-shape-the-future-of-enterprise-computing",
+      "score": 69,
+      "by": "bonzini",
+      "comments": 29,
+      "time": "2026-04-02 16:48"
+    },
+    {
+      "rank": 2,
+      "title": "Bringing Clojure programming to Enterprise (2021)",
+      "url": "https://blogit.michelin.io/clojure-programming/",
+      "score": 52,
+      "by": "smartmic",
+      "comments": 8,
+      "time": "2026-04-02 16:19"
+    },
+    {
+      "rank": 3,
+      "title": "Artemis II Launch Day Updates",
+      "url": "https://www.nasa.gov/blogs/missions/2026/04/01/live-artemis-ii-launch-day-updates/",
+      "score": 936,
+      "by": "apitman",
+      "comments": 799,
+      "time": "2026-04-02 01:11"
+    },
+    {
+      "rank": 4,
+      "title": "Gone (Almost) Phishin'",
+      "url": "https://ma.tt/2026/03/gone-almost-phishin/",
+      "score": 37,
+      "by": "luu",
+      "comments": 16,
+      "time": "2026-03-31 13:11"
+    },
+    {
+      "rank": 5,
+      "title": "Men are ditching TV for YouTube as AI usage and social media fatigue grow",
+      "url": "https://www.ofcom.org.uk/media-use-and-attitudes/media-habits-adults/passive-social-media-use-ai-companionship-and-online-side-hustles-uk-adults-media-and-online-lives-revealed",
+      "score": 7,
+      "by": "bundie",
+      "comments": 0,
+      "time": "2026-04-02 17:43"
+    },
+    {
+      "rank": 6,
+      "title": "Email obfuscation: What works in 2026?",
+      "url": "https://spencermortensen.com/articles/email-obfuscation/",
+      "score": 147,
+      "by": "jaden",
+      "comments": 43,
+      "time": "2026-04-02 11:35"
+    },
+    {
+      "rank": 7,
+      "title": "Mercor says it was hit by cyberattack tied to compromise LiteLLM",
+      "url": "https://techcrunch.com/2026/03/31/mercor-says-it-was-hit-by-cyberattack-tied-to-compromise-of-open-source-litellm-project/",
+      "score": 52,
+      "by": "jackson-mcd",
+      "comments": 16,
+      "time": "2026-04-01 12:14"
+    },
+    {
+      "rank": 8,
+      "title": "Steam on Linux Use Skyrocketed Above 5% in March",
+      "url": "https://www.phoronix.com/news/Steam-On-Linux-Tops-5p",
+      "score": 409,
+      "by": "hkmaxpro",
+      "comments": 190,
+      "time": "2026-04-02 11:12"
+    },
+    {
+      "rank": 9,
+      "title": "Quantum computing bombshells that are not April Fools",
+      "url": "https://scottaaronson.blog/?p=9665",
+      "score": 180,
+      "by": "Strilanc",
+      "comments": 60,
+      "time": "2026-04-02 08:24"
+    },
+    {
+      "rank": 10,
+      "title": "EmDash – A spiritual successor to WordPress that solves plugin security",
+      "url": "https://blog.cloudflare.com/emdash-wordpress/",
+      "score": 578,
+      "by": "elithrar",
+      "comments": 429,
+      "time": "2026-04-02 00:14"
+    },
+    {
+      "rank": 11,
+      "title": "A new C++ back end for ocamlc",
+      "url": "https://github.com/ocaml/ocaml/pull/14701",
+      "score": 185,
+      "by": "glittershark",
+      "comments": 15,
+      "time": "2026-04-02 07:35"
+    },
+    {
+      "rank": 12,
+      "title": "New laws to make it easier to cancel subscriptions and get refunds",
+      "url": "https://www.bbc.co.uk/news/articles/cvg0v36ek2go",
+      "score": 41,
+      "by": "chrisjj",
+      "comments": 9,
+      "time": "2026-04-02 17:00"
+    },
+    {
+      "rank": 14,
+      "title": "DRAM pricing is killing the hobbyist SBC market",
+      "url": "https://www.jeffgeerling.com/blog/2026/dram-pricing-is-killing-the-hobbyist-sbc-market/",
+      "score": 486,
+      "by": "ingve",
+      "comments": 415,
+      "time": "2026-04-02 05:36"
+    },
+    {
+      "rank": 15,
+      "title": "Significant Raise of Reports",
+      "url": "https://lwn.net/Articles/1065620/",
+      "score": 5,
+      "by": "stratos123",
+      "comments": 2,
+      "time": "2026-04-02 17:14"
+    }
+  ]
+}

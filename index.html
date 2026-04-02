@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gary · 数据爬取服务</title>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --text: #e4e4e7;
+      --muted: #71717a;
+      --accent: #06b6d4;
+      --accent-dim: #0891b2;
+      --green: #22c55e;
+      --amber: #f59e0b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-dim); }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+    nav .container { display: flex; justify-content: space-between; align-items: center; height: 60px; max-width: 1100px; margin: 0 auto; }
+    nav .logo { font-weight: 700; font-size: 18px; color: var(--text); }
+    nav .logo span { color: var(--accent); }
+    nav .links a { color: var(--muted); font-size: 14px; margin-left: 24px; transition: color 0.2s; }
+    nav .links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero { padding: 100px 0 80px; text-align: center; }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(6,182,212,0.1);
+      border: 1px solid rgba(6,182,212,0.3);
+      color: var(--accent);
+      font-size: 13px; font-weight: 500;
+      padding: 4px 14px; border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .hero h1 { font-size: 52px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p { font-size: 20px; color: var(--muted); max-width: 580px; margin: 0 auto 36px; }
+    .hero .cta-group { display: flex; gap: 14px; justify-content: center; }
+    .btn {
+      display: inline-block; padding: 12px 28px;
+      border-radius: 8px; font-weight: 600; font-size: 15px;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: var(--accent-dim); transform: translateY(-1px); }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--muted); }
+
+    /* Stats bar */
+    .stats { display: flex; gap: 40px; justify-content: center; padding: 48px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .stat { text-align: center; }
+    .stat .num { font-size: 36px; font-weight: 800; color: var(--accent); }
+    .stat .label { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    /* Services */
+    .section { padding: 80px 0; }
+    .section-header { text-align: center; margin-bottom: 56px; }
+    .section-header h2 { font-size: 32px; font-weight: 700; margin-bottom: 12px; }
+    .section-header p { color: var(--muted); font-size: 16px; }
+
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px 24px;
+      transition: border-color 0.2s;
+    }
+    .service-card:hover { border-color: var(--accent); }
+    .service-icon { font-size: 32px; margin-bottom: 16px; }
+    .service-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .service-card p { font-size: 14px; color: var(--muted); }
+
+    /* Demo Cases */
+    .case-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      transition: border-color 0.2s;
+    }
+    .case-card:hover { border-color: rgba(6,182,212,0.4); }
+    .case-card.reverse { direction: rtl; }
+    .case-card.reverse > * { direction: ltr; }
+    .case-visual { background: #0d0d14; min-height: 280px; display: flex; flex-direction: column; justify-content: center; padding: 32px; overflow: hidden; }
+    .case-number { font-size: 72px; font-weight: 900; color: rgba(6,182,212,0.08); line-height: 1; margin-bottom: 12px; }
+    .case-source { font-size: 13px; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+    .case-tag { display: inline-block; background: rgba(6,182,212,0.12); color: var(--accent); font-size: 12px; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; }
+    .case-data-preview { font-size: 13px; color: var(--muted); line-height: 1.8; border-left: 2px solid var(--border); padding-left: 14px; margin-top: 8px; }
+    .case-data-preview .item { display: flex; align-items: flex-start; gap: 8px; }
+    .case-data-preview .item::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+    .case-info { padding: 36px 32px; display: flex; flex-direction: column; justify-content: center; }
+    .case-info h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .case-info .desc { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+    .case-tech { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .tech-tag { background: rgba(255,255,255,0.05); border: 1px solid var(--border); font-size: 12px; padding: 4px 10px; border-radius: 6px; color: var(--muted); }
+    .case-result { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); border-radius: 8px; padding: 12px 16px; }
+    .case-result .label { font-size: 12px; color: var(--green); font-weight: 600; margin-bottom: 4px; }
+    .case-result .value { font-size: 14px; color: var(--text); }
+
+    /* Tech stack */
+    .stack-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .stack-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; font-weight: 500;
+      transition: border-color 0.2s;
+    }
+    .stack-item:hover { border-color: var(--accent); }
+    .stack-icon { font-size: 20px; }
+
+    /* Process */
+    .process { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; position: relative; }
+    .process-step { padding: 24px; text-align: center; position: relative; }
+    .process-step::after { content: '→'; position: absolute; right: 0; top: 50%; transform: translateY(-50%); color: var(--border); font-size: 20px; }
+    .process-step:last-child::after { display: none; }
+    .step-num { font-size: 40px; font-weight: 900; color: rgba(6,182,212,0.15); margin-bottom: 8px; }
+    .process-step h4 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+    .process-step p { font-size: 13px; color: var(--muted); }
+
+    /* Contact */
+    .contact-section { background: var(--surface); border-top: 1px solid var(--border); padding: 80px 0; text-align: center; }
+    .contact-section h2 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+    .contact-section p { color: var(--muted); font-size: 18px; margin-bottom: 36px; }
+    .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      padding: 12px 24px; border-radius: 8px;
+      color: var(--text); font-size: 15px; font-weight: 500;
+      transition: all 0.2s;
+    }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 28px 0; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* JSON block in case visual */
+    .json-block { font-family: 'Courier New', monospace; font-size: 11px; color: #a1a1aa; line-height: 1.6; overflow: hidden; }
+    .json-block .key { color: #7dd3fc; }
+    .json-block .str { color: #86efac; }
+    .json-block .num { color: #fcd34d; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 34px; }
+      .case-card { grid-template-columns: 1fr; }
+      .case-card.reverse { direction: ltr; }
+      .stats { flex-wrap: wrap; gap: 24px; }
+      .process-step::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="container">
+    <div class="logo">Gary<span>.</span>scrapes</div>
+    <div class="links">
+      <a href="#services">服务</a>
+      <a href="#cases">案例</a>
+      <a href="#stack">技术栈</a>
+      <a href="#contact">联系</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">🚀 数据采集 · 结构化输出 · 快速交付</div>
+    <h1>把网页变成<br><span>结构化数据</span></h1>
+    <p>专业网页爬虫服务，支持 JavaScript 渲染、反爬绕过、批量采集。<br>交付 JSON / CSV / Excel / API 接口。</p>
+    <div class="cta-group">
+      <a href="#contact" class="btn btn-primary">咨询报价</a>
+      <a href="#cases" class="btn btn-secondary">查看案例</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="num">3</div><div class="label">已交付案例</div></div>
+    <div class="stat"><div class="num">60+</div><div class="label">单次采集记录</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">支持输出格式</div></div>
+    <div class="stat"><div class="num">24h</div><div class="label">典型交付周期</div></div>
+  </div>
+</div>
+
+<!-- Services -->
+<section class="section" id="services">
+  <div class="container">
+    <div class="section-header">
+      <h2>我能做什么</h2>
+      <p>从简单页面到复杂 JS 渲染站，统统拿下</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-icon">🛒</div>
+        <h3>电商数据采集</h3>
+        <p>商品价格、评价、库存、SKU，电商平台全品类数据采集，支持增量更新监控</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">📊</div>
+        <h3>SERP 监控</h3>
+        <p>Google / 百度关键词排名监控，批量跟踪竞品关键词波动，支持定时推送</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏢</div>
+        <h3>企业工商信息</h3>
+        <p>天眼查、企查查、爱企查等平台数据清洗，工商信息自动抓取与结构化</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">💼</div>
+        <h3>招聘数据</h3>
+        <p>Boss直聘、猎聘、领英等平台职位数据，支持行业薪资分析维度</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🏠</div>
+        <h3>房产数据</h3>
+        <p>贝壳、链家、安居客房源数据采集，支持价格走势分析与市场报告</p>
+      </div>
+      <div class="service-card">
+        <div class="service-icon">🤖</div>
+        <h3>AI 数据管道</h3>
+        <p>为 LLM / RAG 管道定制化数据采集，清洗后 Markdown 输出，AI-Ready</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cases -->
+<section class="section" id="cases">
+  <div class="container">
+    <div class="section-header">
+      <h2>真实案例</h2>
+      <p>以下均为实际运行过的爬虫，展示真实技术能力</p>
+    </div>
+
+    <!-- Case 1 -->
+    <div class="case-card">
+      <div class="case-visual">
+        <div class="case-number">01</div>
+        <div class="case-source">api.github.com</div>
+        <div class="case-tag">REST API · 搜索排序</div>
+        <div class="json-block" id="case1-json"></div>
+      </div>
+      <div class="case-info">
+        <h3>GitHub Trending 项目采集</h3>
+        <p class="desc">批量采集 GitHub 各语言热门项目，提取 stars、fork、description，用于技术趋势分析和竞品监控。</p>
+        <div class="case-tech">
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">requests</span>
+          <span class="tech-tag">GitHub API</span>
+          <span class="tech-tag">JSON</span>
+          <span class="tech-tag">CSV</span>
+        </div>
+        <div class="case-result">
+          <div class="label">采集结果</div>
+          <div class="value">Python / JS / Go 三语言各 Top 10，每次运行获取 30 个项目完整信息</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 2 -->
+    <div class="case-card reverse">
+      <div class="case-visual">
+        <div class="case-number">02</div>
+        <div class="case-source">news.ycombinator.com</div>
+        <div class="case-tag">JSON API · 实时热榜</div>
+        <div class="json-block" id="case2-json"></div>
+      </div>
+      <div class="case-info">
+        <h3>Hacker News 热点新闻采集</h3>
+        <p class="desc">实时采集 HN 热点新闻，提取标题、URL、分数、评论数、作者，按热度排序输出结构化 JSON。</p>
+        <div class="case-tech">
+          <span class="tech-tag">Python</span>
+          <span class="tech-tag">Firebase API</span>
+          <span class="tech-tag">JSON</span>
+          <span class="tech-tag">定时任务</span>
+        </div>
+        <div class="case-result">
+          <div class="label">采集结果</div>
+          <div class="value">每次运行获取 Top 15 热点，今日最高 936 👍，支持增量监控</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case 3 -->
+    <div class="case-card">
+      <div class="case-visual">
+        <div class="case-number">03</div>
+        <div class="case-source">books.toscrape.com</div>
+        <div class="case-tag">Playwright · JS 动态渲染</div>
+        <div class="json-block" id="case3-json"></div>
+      </div>
+      <div class="case-info">
+        <h3>电商书籍数据采集</h3>
+        <p class="desc">演示完整 JS 渲染站点数据采集能力，包括动态加载内容、评分解析、多页翻页遍历。</p>
+        <div class="case-tech">
+          <span class="tech-tag">Node.js</span>
+          <span class="tech-tag">Playwright</span>
+          <span class="tech-tag">chromium</span>
+          <span class="tech-tag">JSON</span>
+          <span class="tech-tag">CSV</span>
+        </div>
+        <div class="case-result">
+          <div class="label">采集结果</div>
+          <div class="value">3页共 60 本书，价格区间 £22-£54，评分 One~Five 自动归一化</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Process -->
+<section class="section" id="process" style="border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="section-header">
+      <h2>工作流程</h2>
+      <p>简单4步，从需求到交付</p>
+    </div>
+    <div class="process">
+      <div class="process-step">
+        <div class="step-num">01</div>
+        <h4>需求沟通</h4>
+        <p>明确目标网站、数据字段、交付格式和周期</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">02</div>
+        <h4>方案报价</h4>
+        <p>评估技术难度，给出价格和交付时间</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">03</div>
+        <h4>开发测试</h4>
+        <p>爬虫开发 + 数据校验 + 试运行</p>
+      </div>
+      <div class="process-step">
+        <div class="step-num">04</div>
+        <h4>交付验收</h4>
+        <p>交付完整数据 + 爬虫脚本，永久可用</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Tech Stack -->
+<section class="section" id="stack">
+  <div class="container">
+    <div class="section-header">
+      <h2>技术栈</h2>
+      <p>主流工具组合，视项目需求灵活选用</p>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item"><span class="stack-icon">🐍</span>Python</div>
+      <div class="stack-item"><span class="stack-icon">🟢</span>Node.js</div>
+      <div class="stack-item"><span class="stack-icon">🎭</span>Playwright</div>
+      <div class="stack-item"><span class="stack-icon">🕷️</span>Scrapy</div>
+      <div class="stack-item"><span class="stack-icon">🌊</span>Selenium</div>
+      <div class="stack-item"><span class="stack-icon">🔄</span>Requests</div>
+      <div class="stack-item"><span class="stack-icon">📦</span>Pandas</div>
+      <div class="stack-item"><span class="stack-icon">🗄️</span>PostgreSQL</div>
+      <div class="stack-item"><span class="stack-icon">🚀</span>FastAPI</div>
+      <div class="stack-item"><span class="stack-icon">🐳</span>Docker</div>
+      <div class="stack-item"><span class="stack-icon">⏰</span>定时任务</div>
+      <div class="stack-item"><span class="stack-icon">☁️</span>代理池</div>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <h2>有需求？聊聊</h2>
+    <p>简单需求当天报价，复杂项目 24 小时内给出方案</p>
+    <div class="contact-links">
+      <span class="contact-link">📧 zjldsjg2603@163.com</span>
+      <span class="contact-link">💬 微信号：GaryScraper</span>
+    </div>
+    <p style="margin-top:32px;font-size:13px;color:var(--muted);">标注"爬虫需求"，优先处理</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    Gary · 数据采集服务 · 2026 · 使用 Python + Playwright + Scrapy 构建
+  </div>
+</footer>
+
+<script>
+  // 注入真实数据到案例展示
+  async function loadDemos() {
+    try {
+      const [gh, hn, books] = await Promise.all([
+        fetch('demo1_github_trending.json').then(r=>r.json()),
+        fetch('demo2_hackernews.json').then(r=>r.json()),
+        fetch('demo3_books.json').then(r=>r.json()),
+      ]);
+
+      // Case 1: GitHub Trending
+      if (gh.python) {
+        const top3 = gh.python.slice(0,3).map(p => 
+          `{"name":"${p.name.substring(0,22)}","stars":${p.stars}}`
+        ).join('\n  ');
+        document.getElementById('case1-json').innerHTML =
+          '<span class="key">{"python_trending":[\n  ' + top3 + '\n  ]}</span>';
+      }
+
+      // Case 2: Hacker News
+      if (hn.stories) {
+        const top3 = hn.stories.slice(0,3).map(s =>
+          `{"title":"${s.title.substring(0,30)}...","score":${s.score}}`
+        ).join('\n  ');
+        document.getElementById('case2-json').innerHTML =
+          '<span class="key">{"hot_topics":[\n  ' + top3 + '\n  ]}</span>';
+      }
+
+      // Case 3: Books
+      if (books.books) {
+        const top3 = books.books.slice(0,3).map(b =>
+          `{"title":"${b.title.substring(0,26)}...","price":"${b.price}"}`
+        ).join('\n  ');
+        document.getElementById('case3-json').innerHTML =
+          '<span class="key">{"books":[\n  ' + top3 + '\n  ]}</span>';
+      }
+    } catch(e) {
+      // 数据文件未加载时显示占位
+    }
+  }
+  loadDemos();
+</script>
+
+</body>
+</html>
