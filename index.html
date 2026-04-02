@@ -280,56 +280,58 @@
   <div class="section-title">🔥 实时 GitHub 趋势</div>
   <div class="section-desc">每 10 分钟自动刷新 · 来自 GitHub API · 真实数据</div>
 
-  <!-- Stats -->
+  <!-- Time filter -->
+  <div class="lang-filter" style="margin-bottom:24px;">
+    <button class="lang-btn active" data-days="1">🔥 今日新星</button>
+    <button class="lang-btn" data-days="7">📈 本周热榜</button>
+    <button class="lang-btn" data-days="30">🏆 本月热榜</button>
+  </div>
+
+  <!-- Stats: meaningful metrics -->
   <div class="stats-row" id="stats-row">
     <div class="stat-card">
       <div class="num" id="stat-repos">--</div>
-      <div class="label">已采集仓库</div>
+      <div class="label">上榜仓库</div>
     </div>
     <div class="stat-card">
-      <div class="num" id="stat-stars">--</div>
-      <div class="label">总 Star 数</div>
+      <div class="num" id="stat-topstars">--</div>
+      <div class="label">最高单仓</div>
+    </div>
+    <div class="stat-card">
+      <div class="num" id="stat-growth">--</div>
+      <div class="label">最高日增⭐</div>
     </div>
     <div class="stat-card">
       <div class="num" id="stat-lang">--</div>
       <div class="label">覆盖语言</div>
     </div>
-    <div class="stat-card">
-      <div class="num" id="stat-time">--</div>
-      <div class="label">最后更新</div>
-    </div>
   </div>
 
-  <!-- Lang filter -->
-  <div class="lang-filter">
-    <button class="lang-btn active" data-lang="all">全部语言</button>
-    <button class="lang-btn" data-lang="python">Python</button>
-    <button class="lang-btn" data-lang="javascript">JavaScript</button>
-    <button class="lang-btn" data-lang="go">Go</button>
-    <button class="lang-btn" data-lang="rust">Rust</button>
-    <button class="lang-btn" data-lang="typescript">TypeScript</button>
+  <!-- Info bar -->
+  <div id="info-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--muted);font-family:monospace;">
+    <span style="color:var(--accent)" id="info-text">加载中...</span>
   </div>
 
   <div class="two-col">
-    <!-- Repo list -->
+    <!-- Repo list with growth rate -->
     <div>
-      <div class="section-label" style="margin-bottom:16px;">// TOP REPOSITORIES</div>
+      <div class="section-label" style="margin-bottom:16px;">// REPOSITORIES (按日增⭐排序)</div>
       <div class="repos-grid" id="repos-grid">
         <div class="loading"><div class="spinner">⟳</div><div>正在从 GitHub API 获取数据...</div></div>
       </div>
     </div>
-    <!-- Charts -->
+    <!-- Chart: stars per day (growth rate) -->
     <div>
-      <div class="section-label" style="margin-bottom:16px;">// STAR DISTRIBUTION</div>
+      <div class="section-label" style="margin-bottom:16px;">// STAR GROWTH RATE (日增⭐ Top 10)</div>
       <div class="chart-wrap">
-        <div class="chart-title">Top 10 仓库 Star 数对比</div>
-        <div class="chart-container">
+        <div class="chart-title" id="chart-title">日增⭐ 速率对比</div>
+        <div class="chart-container" style="height:300px">
           <canvas id="starChart"></canvas>
         </div>
       </div>
-      <div class="chart-wrap">
+      <div class="chart-wrap" style="margin-top:16px;">
         <div class="chart-title">语言分布</div>
-        <div class="chart-container">
+        <div class="chart-container" style="height:200px">
           <canvas id="langChart"></canvas>
         </div>
       </div>
@@ -382,231 +384,191 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-  // GitHub API rate limit notice: 60 req/hr for unauthenticated
-  // We'll cache data in sessionStorage to avoid hitting limits
-
-  const CACHE_KEY = 'gh_trending_v1';
-  const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+  const CACHE_PREFIX = 'gh_trend_';
+  const CACHE_TTL = 5 * 60 * 1000; // 5 min cache
   const PER_PAGE = 40;
 
-  let currentLang = 'all';
-  let allRepos = [];
+  let currentDays = 1;
+  let cachedRepos = {}; // { days: repos }
   let starChart, langChart;
 
-  // Language colors for GitHub
   const LANG_COLORS = {
-    Python: '#3572A5',
-    JavaScript: '#f1e05a',
-    TypeScript: '#2b7489',
-    Go: '#00ADD8',
-    Rust: '#dea584',
-    Java: '#b07219',
-    'C++': '#f34b7d',
-    C: '#555555',
-    Ruby: '#701516',
-    PHP: '#4F5D95',
-    Swift: '#F05138',
-    Kotlin: '#A97BFF',
-    Shell: '#89e051',
+    Python: '#3572A5', JavaScript: '#f1e05a', TypeScript: '#2b7489',
+    Go: '#00ADD8', Rust: '#dea584', Java: '#b07219',
+    'C++': '#f34b7d', C: '#555555', Ruby: '#701516',
+    PHP: '#4F5D95', Swift: '#F05138', Kotlin: '#A97BFF', Shell: '#89e051',
   };
 
-  async function fetchTrending(lang = 'all') {
-    const cache = sessionStorage.getItem(CACHE_KEY);
-    if (cache) {
-      const { data, ts } = JSON.parse(cache);
-      if (Date.now() - ts < CACHE_TTL) {
-        return data;
-      }
+  // 计算日增⭐（stars / repo存活天数）
+  function calcGrowthRate(repo) {
+    const created = new Date(repo.created_at);
+    const now = new Date();
+    const days = Math.max(1, Math.ceil((now - created) / (1000 * 60 * 60 * 24)));
+    return Math.round(repo.stargazers_count / days * 10) / 10; // 保留1位小数
+  }
+
+  async function fetchByDays(days) {
+    const cacheKey = CACHE_PREFIX + days;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      const { data, ts } = JSON.parse(cached);
+      if (Date.now() - ts < CACHE_TTL) return data;
     }
 
     const created = new Date();
-    created.setDate(created.getDate() - 30);
+    created.setDate(created.getDate() - days);
     const dateStr = created.toISOString().split('T')[0];
-
-    let query = `created:>${dateStr}`;
-    if (lang !== 'all') query += `+language:${lang}`;
-
+    const query = `created:>${dateStr}`;
     const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=${PER_PAGE}&t=${Date.now()}`;
 
-    const resp = await fetch(url, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
-    });
-
+    const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
     if (!resp.ok) throw new Error(`GitHub API ${resp.status}`);
-    const data = await resp.json();
-    const result = data.items || [];
-
-    sessionStorage.setItem(CACHE_KEY, JSON.stringify({ data: result, ts: Date.now() }));
-    return result;
+    const json = await resp.json();
+    const repos = (json.items || []).map(r => ({ ...r, _growth: calcGrowthRate(r) }));
+    sessionStorage.setItem(cacheKey, JSON.stringify({ data: repos, ts: Date.now() }));
+    return repos;
   }
 
   function renderRepos(repos) {
     const grid = document.getElementById('repos-grid');
-    if (!repos.length) {
-      grid.innerHTML = '<div class="loading">暂无数据</div>';
-      return;
-    }
+    if (!repos.length) { grid.innerHTML = '<div class="loading">暂无数据</div>'; return; }
 
-    grid.innerHTML = repos.slice(0, 10).map((r, i) => {
-      const langColor = LANG_COLORS[r.language] || '#8b949e';
-      const maxStars = repos[0].stargazers_count;
-      const barWidth = Math.round((r.stargazers_count / maxStars) * 100);
+    grid.innerHTML = repos.map((r, i) => {
+      const lc = LANG_COLORS[r.language] || '#8b949e';
+      const maxG = repos[0]._growth;
+      const barW = Math.round((r._growth / maxG) * 100);
+      const created = new Date(r.created_at);
+      const age = Math.ceil((new Date() - created) / 86400000);
       return `
-        <div class="repo-card" onclick="window.open('${r.html_url}', '_blank')">
+        <div class="repo-card" onclick="window.open('${r.html_url}','_blank')">
           <div class="repo-top">
             <div class="repo-name">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.5H4.5V2h8a1 1 0 0 1 1 1v5Z"/></svg>
-              ${r.name.length > 22 ? r.name.substring(0,22) + '…' : r.name}
+              ${r.name.length > 24 ? r.name.slice(0,24)+'…' : r.name}
             </div>
             <div class="repo-lang">
-              <span class="lang-dot" style="background:${langColor}"></span>
+              <span class="lang-dot" style="background:${lc}"></span>
               ${r.language || '—'}
             </div>
           </div>
-          <div class="repo-desc">${r.description || 'No description'}</div>
-          <div class="repo-meta">
+          <div class="repo-desc">${r.description || '—'}</div>
+          <div class="repo-meta" style="justify-content:space-between;">
             <span>⭐ ${r.stargazers_count.toLocaleString()}</span>
-            <span>🍴 ${r.forks_count.toLocaleString()}</span>
-            <span>#${i + 1}</span>
+            <span style="color:var(--orange);font-weight:600;">${r._growth}⭐/天</span>
+            <span style="color:var(--muted);">存活 ${age}天</span>
           </div>
           <div class="repo-stars-bar">
-            <div class="repo-stars-fill" style="width:${barWidth}%"></div>
+            <div class="repo-stars-fill" style="width:${barW}%"></div>
           </div>
-        </div>
-      `;
+        </div>`;
     }).join('');
   }
 
   function updateStats(repos) {
-    const totalStars = repos.reduce((s, r) => s + r.stargazers_count, 0);
+    const top = repos[0];
+    const maxGrowth = top ? Math.max(...repos.map(r => r._growth)) : 0;
     const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
-    const now = new Date();
-    const timeStr = `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+    const periodLabel = {1:'今日', 7:'本周', 30:'本月'}[currentDays];
 
     document.getElementById('stat-repos').textContent = repos.length;
-    document.getElementById('stat-stars').textContent = totalStars > 1000 ? Math.round(totalStars/1000) + 'k' : totalStars;
+    document.getElementById('stat-topstars').textContent = top ? (top.stargazers_count >= 1000 ? Math.round(top.stargazers_count/1000)+'k' : top.stargazers_count) : '--';
+    document.getElementById('stat-growth').textContent = maxGrowth ? maxGrowth+'⭐' : '--';
     document.getElementById('stat-lang').textContent = langs.length;
-    document.getElementById('stat-time').textContent = timeStr;
+
+    const infoText = `📊 ${periodLabel}新上榜仓库 · 按「日增⭐」排序 · 体现真实热度增速而非存量`;
+    document.getElementById('info-text').textContent = infoText;
   }
 
   function buildStarChart(repos) {
-    const top10 = repos.slice(0, 10);
     const ctx = document.getElementById('starChart').getContext('2d');
     if (starChart) starChart.destroy();
+    const top10 = repos.slice(0, 10);
+    const colors = ['#f0883e','#bc8cff','#f778ba','#79c0ff','#56d364','#e3b341','#ff7b72','#a5d6ff','#7ee787','#ffa657'];
+
+    const periodLabel = {1:'今日', 7:'本周', 30:'本月'}[currentDays];
 
     starChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: top10.map(r => r.name.length > 12 ? r.name.substring(0,12) + '…' : r.name),
+        labels: top10.map(r => r.name.length > 13 ? r.name.slice(0,13)+'…' : r.name),
         datasets: [{
-          label: 'Stars',
-          data: top10.map(r => r.stargazers_count),
-          backgroundColor: top10.map((_, i) => {
-            const colors = ['#f0883e','#bc8cff','#f778ba','#79c0ff','#56d364','#e3b341','#ff7b72','#a5d6ff','#7ee787','#ffa657'];
-            return colors[i % colors.length];
-          }),
-          borderRadius: 4,
-          borderSkipped: false,
+          label: '日增⭐/天',
+          data: top10.map(r => r._growth),
+          backgroundColor: colors.map((c, i) => i === 0 ? '#f0883e' : c),
+          borderRadius: 4, borderSkipped: false,
         }]
       },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: {
-          callbacks: { label: ctx => `${ctx.raw.toLocaleString()} ⭐` }
-        }},
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: ctx => top10[ctx[0].dataIndex].full_name || top10[ctx[0].dataIndex].name,
+              label: ctx => `${ctx.raw}⭐/天 · 共 ${top10[ctx[0].dataIndex].stargazers_count.toLocaleString()}⭐`
+            }
+          }
+        },
         scales: {
           x: { grid: { color: '#21262d' }, ticks: { color: '#8b949e', font: { size: 10 } } },
-          y: { grid: { color: '#21262d' }, ticks: { color: '#8b949e', callback: v => v >= 1000 ? (v/1000).toFixed(0)+'k' : v } }
+          y: { grid: { color: '#21262d' }, ticks: { color: '#8b949e', callback: v => v+'⭐' } }
         }
       }
     });
   }
 
   function buildLangChart(repos) {
-    const langCounts = {};
-    repos.forEach(r => { if (r.language) langCounts[r.language] = (langCounts[r.language] || 0) + 1; });
-    const sorted = Object.entries(langCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    const colors = sorted.map(l => LANG_COLORS[l[0]] || '#8b949e');
-
     const ctx = document.getElementById('langChart').getContext('2d');
     if (langChart) langChart.destroy();
+    const counts = {};
+    repos.forEach(r => { if (r.language) counts[r.language] = (counts[r.language]||0)+1; });
+    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,8);
+    const colors = sorted.map(l => LANG_COLORS[l[0]] || '#8b949e');
 
     langChart = new Chart(ctx, {
       type: 'doughnut',
-      data: {
-        labels: sorted.map(l => l[0]),
-        datasets: [{
-          data: sorted.map(l => l[1]),
-          backgroundColor: colors,
-          borderWidth: 0,
-        }]
-      },
+      data: { labels: sorted.map(l=>l[0]), datasets: [{ data: sorted.map(l=>l[1]), backgroundColor: colors, borderWidth: 0 }] },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'right',
-            labels: { color: '#c9d1d9', font: { size: 11 }, padding: 12, boxWidth: 12 }
-          },
-          tooltip: {
-            callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} repos` }
-          }
+          legend: { position: 'right', labels: { color: '#c9d1d9', font: { size: 11 }, padding: 12, boxWidth: 12 } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} repos` } }
         }
       }
     });
   }
 
-  function updateTerminal(count) {
-    const out = document.getElementById('term-output');
-    const cnt = document.getElementById('term-count');
-    out.textContent = `Fetching GitHub trending repos...`;
-    setTimeout(() => {
-      out.textContent = `Done. Found ${count} repositories.`;
-      cnt.innerHTML = `<span style="color:var(--green)">✓</span> Top: <span style="color:var(--accent)">${allRepos[0]?.name}</span> · ${allRepos[0]?.stargazers_count.toLocaleString()} ⭐`;
-    }, 800);
-  }
-
-  async function loadData(lang = 'all') {
+  async function loadData(days) {
+    currentDays = days;
     const grid = document.getElementById('repos-grid');
-    grid.innerHTML = '<div class="loading"><div class="spinner">⟳</div><div>正在获取数据...</div></div>';
-
+    grid.innerHTML = '<div class="loading"><div class="spinner">⟳</div><div>正在获取 GitHub 数据...</div></div>';
     try {
-      if (lang === 'all') {
-        allRepos = await fetchTrending('all');
-      } else {
-        allRepos = await fetchTrending(lang);
-      }
-
-      renderRepos(allRepos);
-      updateStats(allRepos);
-      buildStarChart(allRepos);
-      buildLangChart(allRepos);
-      updateTerminal(allRepos.length);
-
-      // Update terminal
-      document.getElementById('term-output').textContent = `Loaded ${allRepos.length} repos · ${allRepos[0]?.stargazers_count?.toLocaleString()} ⭐ top`;
+      const repos = await fetchByDays(days);
+      // 按日增排序
+      repos.sort((a, b) => b._growth - a._growth);
+      cachedRepos[days] = repos;
+      renderRepos(repos);
+      updateStats(repos);
+      buildStarChart(repos);
+      buildLangChart(repos);
+      document.getElementById('term-output').textContent = `Loaded ${repos.length} repos · top repo: ${repos[0]?._growth}⭐/day`;
     } catch (e) {
-      grid.innerHTML = `<div class="loading" style="color:#f85149">API 限流，请稍后再试 (${e.message})</div>`;
+      grid.innerHTML = `<div class="loading" style="color:#f85149">API 限流(${e.message})，请稍后刷新</div>`;
     }
   }
 
-  // Language filter
+  // Time dimension filter
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      currentLang = btn.dataset.lang;
-      loadData(currentLang);
+      loadData(parseInt(btn.dataset.days));
     });
   });
 
   // Init
-  loadData('all');
-
-  // Auto-refresh every 10 min
-  setInterval(() => loadData(currentLang), 10 * 60 * 1000);
+  loadData(1);
+  setInterval(() => loadData(currentDays), 5 * 60 * 1000);
 </script>
 </body>
 </html>
