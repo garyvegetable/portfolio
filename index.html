@@ -3,572 +3,562 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gary · 数据爬虫Portfolio</title>
+  <title>Gary · Data Scraper Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #010409;
-      --surface: #0d1117;
-      --border: #21262d;
-      --text: #c9d1d9;
-      --muted: #8b949e;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --orange: #f0883e;
-      --purple: #bc8cff;
-      --pink: #f778ba;
-      --yellow: #d29922;
+      --bg: #ffffff;
+      --text: #1d1d1f;
+      --text-secondary: #86868b;
+      --border: #d2d2d7;
+      --accent: #0071e3;
+      --accent-hover: #0077ed;
+      --surface: #f5f5f7;
+      --surface2: #fbfbfd;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
+      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
     }
 
     a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
 
-    /* Terminal chrome */
-    .terminal-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      margin: 0 auto;
-      max-width: 1200px;
+    /* ── Navigation ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
     }
-    .terminal-bar {
-      background: #161b22;
-      padding: 12px 16px;
+    .nav-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 22px;
+      height: 52px;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
+      justify-content: space-between;
     }
-    .dot { width: 12px; height: 12px; border-radius: 50%; }
-    .dot.red { background: #ff5f56; }
-    .dot.yellow { background: #ffbd2e; }
-    .dot.green { background: #27c93f; }
-    .terminal-title { flex: 1; text-align: center; font-size: 13px; color: var(--muted); font-family: monospace; }
+    .logo { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+    .logo span { color: var(--text-secondary); font-weight: 400; }
+    .nav-links { display: flex; gap: 28px; font-size: 13px; }
+    .nav-links a { color: var(--text-secondary); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--text); }
 
-    /* Header */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: blur(8px);
-    }
-    .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-    .logo { font-size: 18px; font-weight: 700; color: var(--text); }
-    .logo span { color: var(--green); }
-    .header-links { display: flex; gap: 24px; font-size: 14px; }
-    .header-links a { color: var(--muted); }
-    .header-links a:hover { color: var(--text); }
-
-    /* Hero */
+    /* ── Hero ── */
     .hero {
-      max-width: 1200px;
+      max-width: 980px;
       margin: 0 auto;
-      padding: 80px 24px 40px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 60px;
-      align-items: center;
+      padding: 96px 22px 80px;
+      text-align: center;
     }
-    .hero-left h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
-    .hero-left h1 span { color: var(--green); }
-    .hero-left p { font-size: 18px; color: var(--muted); line-height: 1.7; margin-bottom: 28px; }
-    .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
-    .tag {
-      background: rgba(63,185,80,0.1);
-      border: 1px solid rgba(63,185,80,0.3);
-      color: var(--green);
-      font-size: 13px;
+    .hero-eyebrow {
+      font-size: 14px;
       font-weight: 500;
-      padding: 4px 14px;
-      border-radius: 20px;
-      font-family: monospace;
+      color: var(--accent);
+      letter-spacing: -0.2px;
+      margin-bottom: 12px;
     }
-    .hero-btns { display: flex; gap: 14px; }
-    .btn { padding: 11px 26px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: inline-block; }
-    .btn-green { background: var(--green); color: #000; border: none; }
-    .btn-green:hover { background: #2ea043; transform: translateY(-1px); }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
-    .btn-outline:hover { border-color: var(--muted); }
-
-    /* Terminal in hero */
-    .hero-terminal { background: #0d1117; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .hero-terminal .terminal-bar { padding: 8px 12px; }
-    .term-body { padding: 16px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; color: var(--muted); }
-    .term-body .cmd { color: var(--green); }
-    .term-body .output { color: var(--text); }
-    .term-body .dim { color: var(--muted); opacity: 0.6; }
-
-    /* Section */
-    .section { max-width: 1200px; margin: 0 auto; padding: 60px 24px; }
-    .section-label { font-family: monospace; font-size: 13px; color: var(--green); margin-bottom: 8px; }
-    .section-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-    .section-desc { color: var(--muted); margin-bottom: 32px; }
-
-    /* Language filter */
-    .lang-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
-    .lang-btn {
-      padding: 7px 18px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      font-size: 13px;
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 64px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -1.5px;
+      margin-bottom: 20px;
+    }
+    .hero p {
+      font-size: 19px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      max-width: 540px;
+      margin: 0 auto 36px;
+      font-weight: 400;
+    }
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 980px;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s;
-      font-family: monospace;
+      border: none;
     }
-    .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
-    .lang-btn.active { background: rgba(88,166,255,0.1); border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); transform: scale(1.02); }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--text); }
 
-    /* Stats row */
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-    .stat-card {
+    /* ── Section ── */
+    .section {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 22px 100px;
+    }
+    .section-head { margin-bottom: 48px; }
+    .section-head h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.8px;
+      margin-bottom: 8px;
+    }
+    .section-head p { font-size: 16px; color: var(--text-secondary); }
+
+    /* ── Time Filter ── */
+    .filter-bar {
+      display: flex;
+      gap: 4px;
       background: var(--surface);
+      border-radius: 12px;
+      padding: 4px;
+      width: fit-content;
+      margin-bottom: 40px;
+    }
+    .filter-btn {
+      padding: 9px 20px;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .filter-btn.active {
+      background: var(--bg);
+      color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.04);
+    }
+    .filter-btn:hover:not(.active) { color: var(--text); }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 40px;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
+    }
+    .stat-cell {
+      background: var(--bg);
+      padding: 24px 28px;
       text-align: center;
-      transition: border-color 0.2s;
-      min-height: 100px;
+    }
+    .stat-cell:hover { background: var(--surface2); }
+    .stat-num {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -1.5px;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label { font-size: 13px; color: var(--text-secondary); }
+
+    /* ── Chart Section ── */
+    .chart-section {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 36px 40px;
+      margin-bottom: 40px;
+    }
+    .chart-section h3 {
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+    .chart-section .sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+    .chart-container { position: relative; height: 220px; }
+
+    /* ── Repo Cards ── */
+    .repos-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .repo-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      cursor: pointer;
+      transition: all 0.2s;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      gap: 8px;
     }
-    .stat-card:hover { border-color: var(--green); }
-    .stat-card .num { font-size: 26px; font-weight: 800; color: var(--green); }
-    .stat-card .label { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-    /* Repo cards */
-    .repos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .repo-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 18px 20px;
-      transition: border-color 0.2s, transform 0.2s;
-      cursor: pointer;
+    .repo-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(0,113,227,0.08);
+      transform: translateY(-1px);
     }
-    .repo-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .repo-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .repo-name { font-size: 15px; font-weight: 600; color: var(--accent); display: flex; align-items: center; gap: 6px; }
-    .repo-name svg { flex-shrink: 0; }
-    .repo-lang { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .repo-top { display: flex; align-items: center; justify-content: space-between; }
+    .repo-name { font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: -0.2px; }
+    .repo-lang { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
     .lang-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .repo-desc { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .repo-meta { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
-    .repo-meta span { display: flex; align-items: center; gap: 4px; }
-    .repo-stars-bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 12px; overflow: hidden; }
-    .repo-stars-fill { height: 100%; background: linear-gradient(90deg, var(--orange), var(--pink)); border-radius: 2px; transition: width 1s ease; }
+    .repo-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .repo-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .repo-stars { font-size: 13px; color: var(--text); font-weight: 500; }
+    .repo-growth { font-size: 14px; font-weight: 700; color: #1d1d1f; }
+    .repo-growth span { font-size: 11px; font-weight: 400; color: var(--text-secondary); margin-left: 2px; }
+    .growth-bar-bg { height: 4px; background: var(--surface); border-radius: 2px; overflow: hidden; }
+    .growth-bar { height: 4px; border-radius: 2px; background: var(--accent); transition: width 0.8s ease; }
 
-    /* Loading */
-    .loading { text-align: center; padding: 60px; color: var(--muted); font-family: monospace; }
-    .loading .spinner { font-size: 24px; animation: blink 1s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-    /* Chart */
-    .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
-    .chart-title { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
-    .chart-container { position: relative; height: 260px; }
-
-    /* Two columns layout */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-
-    /* Case cards */
-    .case-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    /* ── Cases ── */
+    .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .case-card {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 24px;
-      transition: border-color 0.2s;
+      border-radius: 18px;
+      padding: 30px 26px;
+      transition: all 0.2s;
     }
-    .case-card:hover { border-color: var(--green); }
-    .case-icon { font-size: 32px; margin-bottom: 12px; }
-    .case-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
-    .case-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
-    .case-badge { display: inline-block; background: rgba(63,185,80,0.1); color: var(--green); font-size: 11px; padding: 2px 8px; border-radius: 4px; margin-top: 10px; font-family: monospace; }
+    .case-card:hover { background: var(--surface2); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .case-icon { font-size: 36px; margin-bottom: 16px; display: block; }
+    .case-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.2px; }
+    .case-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px; }
+    .case-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .case-tag { background: var(--bg); font-size: 11px; padding: 4px 10px; border-radius: 6px; color: var(--text-secondary); border: 1px solid var(--border); font-family: monospace; }
 
-    /* Contact */
-    .contact-bar {
+    /* ── Contact ── */
+    .contact {
       background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 40px;
+      border-radius: 24px;
+      padding: 72px 40px;
       text-align: center;
-      margin: 60px auto;
-      max-width: 800px;
+      margin-bottom: 60px;
     }
-    .contact-bar h2 { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-    .contact-bar p { color: var(--muted); margin-bottom: 24px; }
-    .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .contact h2 { font-size: 36px; font-weight: 700; letter-spacing: -1px; margin-bottom: 12px; }
+    .contact p { font-size: 17px; color: var(--text-secondary); margin-bottom: 32px; }
+    .contact-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .contact-pill {
-      background: rgba(63,185,80,0.1);
-      border: 1px solid rgba(63,185,80,0.3);
-      color: var(--green);
-      padding: 10px 20px;
-      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 11px 22px;
+      border-radius: 980px;
       font-size: 14px;
-      font-family: monospace;
+      font-weight: 500;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
     }
 
-    /* Footer */
-    footer { text-align: center; padding: 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 48px; color: var(--text-secondary); font-size: 14px; }
+    .loading .spin { font-size: 22px; animation: spin 1s linear infinite; display: block; margin-bottom: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; padding: 40px 16px; }
-      .hero h1 { font-size: 32px; }
-      .repos-grid, .two-col, .case-grid { grid-template-columns: 1fr; }
-      .stats-row { grid-template-columns: 1fr 1fr; }
+      .hero { padding: 64px 22px 56px; }
+      .hero h1 { font-size: 36px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .repos-grid { grid-template-columns: 1fr; }
+      .cases-grid { grid-template-columns: 1fr; }
+      .filter-bar { width: 100%; }
+      .filter-btn { flex: 1; text-align: center; padding: 9px 8px; }
     }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="header-inner">
-    <div class="logo">gary<span>.</span>scrapes</div>
-    <div class="header-links">
-      <a href="#cases">案例</a>
-      <a href="#live">🔥 实时数据</a>
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Gary<span>.dev</span></div>
+    <div class="nav-links">
+      <a href="#work">案例</a>
+      <a href="#data">实时数据</a>
       <a href="#contact">联系</a>
     </div>
   </div>
-</header>
+</nav>
 
 <!-- Hero -->
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-tags">
-      <span class="tag">$ python demo1.py</span>
-      <span class="tag">$ node demo3.mjs</span>
-      <span class="tag">// Playwright · 动态渲染</span>
-    </div>
-    <h1>把任意网站<br>变成<span>结构化数据</span></h1>
-    <p>专业网页爬虫服务，支持 JavaScript 动态渲染、反爬绕过、批量采集。<br>交付 JSON / CSV / API，已服务多个客户。</p>
-    <div class="hero-btns">
-      <a href="#contact" class="btn btn-green">咨询报价</a>
-      <a href="#live" class="btn btn-outline">看实时数据 →</a>
-    </div>
+<section class="hero">
+  <div class="hero-eyebrow">数据爬取 · 结构化输出</div>
+  <h1>把任意网站<br>变成可用数据</h1>
+  <p>专业网页爬虫服务，支持 JavaScript 动态渲染、反爬绕过、批量采集。交付 JSON / CSV / API 接口。</p>
+  <div class="hero-btns">
+    <a href="#contact" class="btn btn-primary">咨询报价</a>
+    <a href="#data" class="btn btn-outline">看实时案例 →</a>
   </div>
-  <div class="hero-terminal">
-    <div class="terminal-bar">
-      <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
-      <div class="terminal-title">gary@portfolio:~/scrapers</div>
-    </div>
-    <div class="term-body">
-      <div><span class="dim">$</span> <span class="cmd">python3 demo1_github_trending.py</span></div>
-      <div class="output" id="term-output">Scraping GitHub API...</div>
-      <div class="output" id="term-count"></div>
-      <div class="dim">$</div>
-    </div>
-  </div>
-</div>
+</section>
 
-<!-- Live Data Section -->
-<section class="section" id="live">
-  <div class="section-label">// 02. LIVE DATA</div>
-  <div class="section-title">🔥 实时 GitHub 趋势</div>
-  <div class="section-desc">每 10 分钟自动刷新 · 来自 GitHub API · 真实数据</div>
-
-  <!-- Time filter -->
-  <div class="lang-filter" style="margin-bottom:24px;">
-    <button class="lang-btn active" data-days="1">🔥 今日新星</button>
-    <button class="lang-btn" data-days="7">📈 本周热榜</button>
-    <button class="lang-btn" data-days="30">🏆 本月热榜</button>
+<!-- Live Data -->
+<section class="section" id="data">
+  <div class="section-head">
+    <h2>🔥 GitHub 实时趋势</h2>
+    <p>数据来自 GitHub API，按「日增⭐」排序 — 体现真实热度增速，而非存量</p>
   </div>
 
-  <!-- Stats: meaningful metrics -->
-  <div class="stats-row" id="stats-row">
-    <div class="stat-card">
-      <div class="num" id="stat-repos">--</div>
-      <div class="label">上榜仓库</div>
+  <!-- Time Filter -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-days="1">🔥 今日新星</button>
+    <button class="filter-btn" data-days="7">📈 本周热榜</button>
+    <button class="filter-btn" data-days="30">🏆 本月热榜</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-num" id="s-repos">—</div>
+      <div class="stat-label">上榜仓库</div>
     </div>
-    <div class="stat-card">
-      <div class="num" id="stat-topstars">--</div>
-      <div class="label">最高单仓</div>
+    <div class="stat-cell">
+      <div class="stat-num" id="s-top">—</div>
+      <div class="stat-label">最高日增</div>
     </div>
-    <div class="stat-card">
-      <div class="num" id="stat-growth">--</div>
-      <div class="label">最高日增⭐</div>
+    <div class="stat-cell">
+      <div class="stat-num" id="s-total">—</div>
+      <div class="stat-label">总 Star</div>
     </div>
-    <div class="stat-card">
-      <div class="num" id="stat-lang">--</div>
-      <div class="label">覆盖语言</div>
+    <div class="stat-cell">
+      <div class="stat-num" id="s-lang">—</div>
+      <div class="stat-label">语言数</div>
     </div>
   </div>
 
-  <!-- Info bar -->
-  <div id="info-bar" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:24px;font-size:13px;color:var(--muted);font-family:monospace;">
-    <span style="color:var(--accent)" id="info-text">加载中...</span>
+  <!-- Chart -->
+  <div class="chart-section">
+    <h3>日增⭐ 速率对比</h3>
+    <div class="sub">每个仓库每日平均获得的 star 数量 — 数字越大说明热度越高</div>
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
   </div>
 
-  <div class="two-col">
-    <!-- Repo list with growth rate -->
-    <div>
-      <div class="section-label" style="margin-bottom:16px;">// REPOSITORIES (按日增⭐排序)</div>
-      <div class="repos-grid" id="repos-grid">
-        <div class="loading"><div class="spinner">⟳</div><div>正在从 GitHub API 获取数据...</div></div>
-      </div>
-    </div>
-    <!-- Chart: stars per day (growth rate) -->
-    <div>
-      <div class="section-label" style="margin-bottom:16px;">// STAR GROWTH RATE (日增⭐ Top 10)</div>
-      <div class="chart-wrap">
-        <div class="chart-title" id="chart-title">日增⭐ 速率对比</div>
-        <div class="chart-container" style="height:300px">
-          <canvas id="starChart"></canvas>
-        </div>
-      </div>
-      <div class="chart-wrap" style="margin-top:16px;">
-        <div class="chart-title">语言分布</div>
-        <div class="chart-container" style="height:200px">
-          <canvas id="langChart"></canvas>
-        </div>
-      </div>
-    </div>
+  <!-- Repo Cards: Top 10 -->
+  <div class="repos-grid" id="repos-grid">
+    <div class="loading"><span class="spin">⟳</span>正在加载数据...</div>
   </div>
 </section>
 
 <!-- Cases -->
-<section class="section" id="cases">
-  <div class="section-label">// 03. CASE STUDIES</div>
-  <div class="section-title">交付案例</div>
-  <div class="section-desc">以下均为实际运行过的爬虫，包含完整源码和数据</div>
-
-  <div class="case-grid">
+<section class="section" id="work">
+  <div class="section-head">
+    <h2>交付案例</h2>
+    <p>实际运行过的爬虫，含完整源码和真实数据</p>
+  </div>
+  <div class="cases-grid">
     <div class="case-card">
-      <div class="case-icon">🛒</div>
+      <span class="case-icon">🛒</span>
       <h3>GitHub Trending 采集</h3>
       <p>REST API 批量采集 GitHub 热门项目，支持多语言筛选、star 数量排序，输出 JSON + CSV。</p>
-      <div class="case-badge">requests · GitHub API · JSON</div>
+      <div class="case-tags">
+        <span class="case-tag">requests</span>
+        <span class="case-tag">GitHub API</span>
+        <span class="case-tag">JSON</span>
+      </div>
     </div>
     <div class="case-card">
-      <div class="case-icon">📰</div>
+      <span class="case-icon">📰</span>
       <h3>Hacker News 热点监控</h3>
       <p>Firebase JSON API 实时采集 HN 热点，按分数排序，支持增量监控和定时推送。</p>
-      <div class="case-badge">Firebase API · Python · 定时任务</div>
+      <div class="case-tags">
+        <span class="case-tag">Firebase API</span>
+        <span class="case-tag">Python</span>
+        <span class="case-tag">定时任务</span>
+      </div>
     </div>
     <div class="case-card">
-      <div class="case-icon">🤖</div>
+      <span class="case-icon">🤖</span>
       <h3>JS 动态渲染站采集</h3>
       <p>Playwright 模拟浏览器渲染，采集 JS 加载的动态内容，支持翻页遍历和复杂交互。</p>
-      <div class="case-badge">Playwright · chromium · async</div>
+      <div class="case-tags">
+        <span class="case-tag">Playwright</span>
+        <span class="case-tag">chromium</span>
+        <span class="case-tag">async</span>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- Contact -->
-<div class="contact-bar" id="contact">
-  <h2>有爬虫需求？聊聊</h2>
-  <p>简单需求当天报价，复杂项目 24 小时内给出方案</p>
-  <div class="contact-links">
-    <span class="contact-pill">📧 zjldsjg2603@163.com</span>
-    <span class="contact-pill">💬 wewe-here</span>
-    <span class="contact-pill">🌐 garyvegetable.github.io/portfolio</span>
+<div class="section" id="contact">
+  <div class="contact">
+    <h2>有爬虫需求？聊聊</h2>
+    <p>简单需求当天报价，复杂项目 24 小时内给出方案</p>
+    <div class="contact-links">
+      <span class="contact-pill">📧 zjldsjg2603@163.com</span>
+      <span class="contact-pill">💬 wewe-here</span>
+    </div>
   </div>
 </div>
 
 <footer>
-  Built with Python + Playwright + GitHub API · Gary © 2026
+  Gary · 数据采集服务 · 2026 · Built with Python + Playwright + GitHub API
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-  const CACHE_PREFIX = 'gh_trend_';
-  const CACHE_TTL = 5 * 60 * 1000; // 5 min cache
+  const CACHE_KEY = d => `gh_trend_${d}_v1`;
+  const CACHE_TTL = 5 * 60 * 1000;
+  let chart = null;
+  let currentDays = 1;
   const PER_PAGE = 40;
 
-  let currentDays = 1;
-  let cachedRepos = {}; // { days: repos }
-  let starChart, langChart;
-
   const LANG_COLORS = {
-    Python: '#3572A5', JavaScript: '#f1e05a', TypeScript: '#2b7489',
-    Go: '#00ADD8', Rust: '#dea584', Java: '#b07219',
-    'C++': '#f34b7d', C: '#555555', Ruby: '#701516',
-    PHP: '#4F5D95', Swift: '#F05138', Kotlin: '#A97BFF', Shell: '#89e051',
+    Python:'#3572A5', JavaScript:'#f1e05a', TypeScript:'#2b7489',
+    Go:'#00ADD8', Rust:'#dea584', Java:'#b07219',
+    'C++':'#f34b7d', C:'#555555', Ruby:'#701516',
+    PHP:'#4F5D95', Swift:'#F05138', Kotlin:'#A97BFF', Shell:'#89e051',
   };
 
-  // 计算日增⭐（stars / repo存活天数）
-  function calcGrowthRate(repo) {
-    const created = new Date(repo.created_at);
-    const now = new Date();
-    const days = Math.max(1, Math.ceil((now - created) / (1000 * 60 * 60 * 24)));
-    return Math.round(repo.stargazers_count / days * 10) / 10; // 保留1位小数
+  // 日增速率: stars / 存活天数
+  function growthRate(r) {
+    const days = Math.max(1, Math.ceil((Date.now() - new Date(r.created_at)) / 86400000));
+    return Math.round(r.stargazers_count / days * 10) / 10;
   }
 
-  async function fetchByDays(days) {
-    const cacheKey = CACHE_PREFIX + days;
-    const cached = sessionStorage.getItem(cacheKey);
+  async function fetchRepos(days) {
+    const ck = CACHE_KEY(days);
+    const cached = sessionStorage.getItem(ck);
     if (cached) {
       const { data, ts } = JSON.parse(cached);
       if (Date.now() - ts < CACHE_TTL) return data;
     }
-
     const created = new Date();
     created.setDate(created.getDate() - days);
-    const dateStr = created.toISOString().split('T')[0];
-    const query = `created:>${dateStr}`;
-    const url = `https://api.github.com/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=${PER_PAGE}&t=${Date.now()}`;
-
+    const url = `https://api.github.com/search/repositories?q=created:>${created.toISOString().split('T')[0]}&sort=stars&order=desc&per_page=${PER_PAGE}&t=${Date.now()}`;
     const resp = await fetch(url, { headers: { 'Accept': 'application/vnd.github.v3+json' } });
-    if (!resp.ok) throw new Error(`GitHub API ${resp.status}`);
+    if (!resp.ok) throw new Error(resp.status);
     const json = await resp.json();
-    const repos = (json.items || []).map(r => ({ ...r, _growth: calcGrowthRate(r) }));
-    sessionStorage.setItem(cacheKey, JSON.stringify({ data: repos, ts: Date.now() }));
-    return repos;
-  }
-
-  function renderRepos(repos) {
-    const grid = document.getElementById('repos-grid');
-    if (!repos.length) { grid.innerHTML = '<div class="loading">暂无数据</div>'; return; }
-
-    grid.innerHTML = repos.map((r, i) => {
-      const lc = LANG_COLORS[r.language] || '#8b949e';
-      const maxG = repos[0]._growth;
-      const barW = Math.round((r._growth / maxG) * 100);
-      const created = new Date(r.created_at);
-      const age = Math.ceil((new Date() - created) / 86400000);
-      return `
-        <div class="repo-card" onclick="window.open('${r.html_url}','_blank')">
-          <div class="repo-top">
-            <div class="repo-name">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2.5A2.5 2.5 0 0 1 4.5 0h8.75a.75.75 0 0 1 .75.75v12.5a.75.75 0 0 1-.75.75h-2.5a.75.75 0 0 1 0-1.5h1.75v-2h-8a1 1 0 0 0-.714 1.7.75.75 0 1 1-1.072 1.05A2.495 2.495 0 0 1 2 11.5Zm10.5-1h-8a1 1 0 0 0-1 1v6.5H4.5V2h8a1 1 0 0 1 1 1v5Z"/></svg>
-              ${r.name.length > 24 ? r.name.slice(0,24)+'…' : r.name}
-            </div>
-            <div class="repo-lang">
-              <span class="lang-dot" style="background:${lc}"></span>
-              ${r.language || '—'}
-            </div>
-          </div>
-          <div class="repo-desc">${r.description || '—'}</div>
-          <div class="repo-meta" style="justify-content:space-between;">
-            <span>⭐ ${r.stargazers_count.toLocaleString()}</span>
-            <span style="color:var(--orange);font-weight:600;">${r._growth}⭐/天</span>
-            <span style="color:var(--muted);">存活 ${age}天</span>
-          </div>
-          <div class="repo-stars-bar">
-            <div class="repo-stars-fill" style="width:${barW}%"></div>
-          </div>
-        </div>`;
-    }).join('');
+    const data = (json.items || []).map(r => ({ ...r, _gr: growthRate(r) }));
+    sessionStorage.setItem(ck, JSON.stringify({ data, ts: Date.now() }));
+    return data;
   }
 
   function updateStats(repos) {
     const top = repos[0];
-    const maxGrowth = top ? Math.max(...repos.map(r => r._growth)) : 0;
+    const maxGr = top ? Math.max(...repos.map(r => r._gr)) : 0;
     const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
-    const periodLabel = {1:'今日', 7:'本周', 30:'本月'}[currentDays];
-
-    document.getElementById('stat-repos').textContent = repos.length;
-    document.getElementById('stat-topstars').textContent = top ? (top.stargazers_count >= 1000 ? Math.round(top.stargazers_count/1000)+'k' : top.stargazers_count) : '--';
-    document.getElementById('stat-growth').textContent = maxGrowth ? maxGrowth+'⭐' : '--';
-    document.getElementById('stat-lang').textContent = langs.length;
-
-    const infoText = `📊 ${periodLabel}新上榜仓库 · 按「日增⭐」排序 · 体现真实热度增速而非存量`;
-    document.getElementById('info-text').textContent = infoText;
+    const total = repos.reduce((s, r) => s + r.stargazers_count, 0);
+    document.getElementById('s-repos').textContent = repos.length;
+    document.getElementById('s-top').textContent = maxGr ? `${maxGr}⭐` : '—';
+    document.getElementById('s-total').textContent = total >= 1000 ? Math.round(total/1000)+'k' : total;
+    document.getElementById('s-lang').textContent = langs.length;
   }
 
-  function buildStarChart(repos) {
-    const ctx = document.getElementById('starChart').getContext('2d');
-    if (starChart) starChart.destroy();
+  function renderRepos(repos) {
+    const grid = document.getElementById('repos-grid');
     const top10 = repos.slice(0, 10);
-    const colors = ['#f0883e','#bc8cff','#f778ba','#79c0ff','#56d364','#e3b341','#ff7b72','#a5d6ff','#7ee787','#ffa657'];
+    if (!top10.length) { grid.innerHTML = '<div class="loading">暂无数据</div>'; return; }
+    grid.innerHTML = top10.map((r, i) => {
+      const lc = LANG_COLORS[r.language] || '#8b949e';
+      const maxGr = top10[0]._gr;
+      const pct = Math.round((r._gr / maxGr) * 100);
+      const age = Math.ceil((Date.now() - new Date(r.created_at)) / 86400000);
+      return `<div class="repo-card" onclick="window.open('${r.html_url}','_blank')">
+        <div class="repo-top">
+          <div class="repo-name">${r.name}</div>
+          <div class="repo-lang"><span class="lang-dot" style="background:${lc}"></span>${r.language || '—'}</div>
+        </div>
+        <div class="repo-desc">${r.description || '—'}</div>
+        <div class="repo-footer">
+          <div class="repo-stars">⭐ ${r.stargazers_count.toLocaleString()}</div>
+          <div class="repo-growth">${r._gr}<span>⭐/天</span></div>
+        </div>
+        <div class="growth-bar-bg">
+          <div class="growth-bar" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+    }).join('');
+  }
 
-    const periodLabel = {1:'今日', 7:'本周', 30:'本月'}[currentDays];
-
-    starChart = new Chart(ctx, {
+  function buildChart(repos) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    const top10 = repos.slice(0, 10).reverse(); // 让最大的在最右边
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: top10.map(r => r.name.length > 13 ? r.name.slice(0,13)+'…' : r.name),
+        labels: top10.map(r => r.name.length > 16 ? r.name.slice(0,16)+'…' : r.name),
         datasets: [{
-          label: '日增⭐/天',
-          data: top10.map(r => r._growth),
-          backgroundColor: colors.map((c, i) => i === 0 ? '#f0883e' : c),
-          borderRadius: 4, borderSkipped: false,
+          data: top10.map(r => r._gr),
+          backgroundColor: top10.map((_, i) => {
+            const alpha = 0.35 + (i / top10.length) * 0.65;
+            return `rgba(0,113,227,${alpha})`;
+          }),
+          borderRadius: 5,
+          borderSkipped: false,
         }]
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: {
             callbacks: {
               title: ctx => top10[ctx[0].dataIndex].full_name || top10[ctx[0].dataIndex].name,
-              label: ctx => `${ctx.raw}⭐/天 · 共 ${top10[ctx[0].dataIndex].stargazers_count.toLocaleString()}⭐`
+              label: ctx => ` ${ctx.raw}⭐/天 · 共 ${top10[ctx[0].dataIndex].stargazers_count.toLocaleString()}⭐`
             }
           }
         },
         scales: {
-          x: { grid: { color: '#21262d' }, ticks: { color: '#8b949e', font: { size: 10 } } },
-          y: { grid: { color: '#21262d' }, ticks: { color: '#8b949e', callback: v => v+'⭐' } }
+          x: {
+            grid: { display: false },
+            ticks: { color: '#86868b', font: { size: 11 } },
+            border: { display: false }
+          },
+          y: {
+            grid: { color: '#d2d2d7', lineWidth: 0.5 },
+            ticks: { color: '#86868b', font: { size: 11 }, callback: v => v + '⭐' },
+            border: { display: false, dash: [3, 3] }
+          }
         }
       }
     });
   }
 
-  function buildLangChart(repos) {
-    const ctx = document.getElementById('langChart').getContext('2d');
-    if (langChart) langChart.destroy();
-    const counts = {};
-    repos.forEach(r => { if (r.language) counts[r.language] = (counts[r.language]||0)+1; });
-    const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0,8);
-    const colors = sorted.map(l => LANG_COLORS[l[0]] || '#8b949e');
-
-    langChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: { labels: sorted.map(l=>l[0]), datasets: [{ data: sorted.map(l=>l[1]), backgroundColor: colors, borderWidth: 0 }] },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'right', labels: { color: '#c9d1d9', font: { size: 11 }, padding: 12, boxWidth: 12 } },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} repos` } }
-        }
-      }
-    });
-  }
-
-  async function loadData(days) {
+  async function load(days) {
     currentDays = days;
     const grid = document.getElementById('repos-grid');
-    grid.innerHTML = '<div class="loading"><div class="spinner">⟳</div><div>正在获取 GitHub 数据...</div></div>';
+    grid.innerHTML = '<div class="loading"><span class="spin">⟳</span>正在加载...</div>';
     try {
-      const repos = await fetchByDays(days);
-      // 按日增排序
-      repos.sort((a, b) => b._growth - a._growth);
-      cachedRepos[days] = repos;
-      renderRepos(repos);
+      const repos = await fetchRepos(days);
+      repos.sort((a, b) => b._gr - a._gr);
       updateStats(repos);
-      buildStarChart(repos);
-      buildLangChart(repos);
-      document.getElementById('term-output').textContent = `Loaded ${repos.length} repos · top repo: ${repos[0]?._growth}⭐/day`;
+      renderRepos(repos);
+      buildChart(repos);
     } catch (e) {
-      grid.innerHTML = `<div class="loading" style="color:#f85149">API 限流(${e.message})，请稍后刷新</div>`;
+      grid.innerHTML = `<div class="loading" style="color:#ff3b30">加载失败 (API 限流 ${e.message})，请刷新重试</div>`;
     }
   }
 
-  // Time dimension filter
-  document.querySelectorAll('.lang-btn').forEach(btn => {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      loadData(parseInt(btn.dataset.days));
+      load(parseInt(btn.dataset.days));
     });
   });
 
-  // Init
-  loadData(1);
-  setInterval(() => loadData(currentDays), 5 * 60 * 1000);
+  load(1);
+  setInterval(() => load(currentDays), 5 * 60 * 1000);
 </script>
 </body>
 </html>
