@@ -8,14 +8,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
+      --bg: #fafafa;
       --text: #1d1d1f;
       --text-secondary: #86868b;
-      --border: #d2d2d7;
+      --border: #e5e5ea;
       --accent: #0071e3;
       --accent-hover: #0077ed;
-      --surface: #f5f5f7;
-      --surface2: #fbfbfd;
+      --surface: #f0f0f3;
+      --surface2: #f8f8fa;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -192,7 +192,7 @@
       gap: 12px;
     }
     .repo-card {
-      background: var(--bg);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 20px 22px;
@@ -204,7 +204,7 @@
     }
     .repo-card:hover {
       border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(0,113,227,0.08);
+      box-shadow: 0 2px 12px rgba(0,113,227,0.1);
       transform: translateY(-1px);
     }
     .repo-top { display: flex; align-items: center; justify-content: space-between; }
@@ -222,17 +222,18 @@
     /* ── Cases ── */
     .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .case-card {
-      background: var(--surface);
+      background: #ffffff;
+      border: 1px solid var(--border);
       border-radius: 18px;
       padding: 30px 26px;
       transition: all 0.2s;
     }
-    .case-card:hover { background: var(--surface2); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .case-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-2px); }
     .case-icon { font-size: 36px; margin-bottom: 16px; display: block; }
     .case-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.2px; }
     .case-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px; }
     .case-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .case-tag { background: var(--bg); font-size: 11px; padding: 4px 10px; border-radius: 6px; color: var(--text-secondary); border: 1px solid var(--border); font-family: monospace; }
+    .case-tag { background: var(--surface); font-size: 11px; padding: 4px 10px; border-radius: 6px; color: var(--text-secondary); border: 1px solid var(--border); font-family: monospace; }
 
     /* ── Contact ── */
     .contact {
@@ -246,7 +247,7 @@
     .contact p { font-size: 17px; color: var(--text-secondary); margin-bottom: 32px; }
     .contact-links { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
     .contact-pill {
-      background: var(--bg);
+      background: #ffffff;
       border: 1px solid var(--border);
       padding: 11px 22px;
       border-radius: 980px;
