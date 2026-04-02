@@ -491,7 +491,7 @@
 
   function buildChart(repos) {
     const ctx = document.getElementById('chart').getContext('2d');
-    const top10 = repos.slice(0, 10).reverse(); // 让最大的在最右边
+    const top10 = repos.slice(0, 10); // 最大的在顶部
     if (chart) chart.destroy();
     chart = new Chart(ctx, {
       type: 'bar',
@@ -500,7 +500,7 @@
         datasets: [{
           data: top10.map(r => r._gr),
           backgroundColor: top10.map((_, i) => {
-            const alpha = 0.4 + (i / top10.length) * 0.6;
+            const alpha = 1.0 - (i / top10.length) * 0.6;
             return `rgba(0,113,227,${alpha})`;
           }),
           borderRadius: 5,
